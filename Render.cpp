@@ -74,7 +74,10 @@ class Prisma {
 		glBegin(GL_TRIANGLES);
 		{
 			for (double* i : { A,H,B,B,D,C,H,D,B,F,D,H,F,E,D }) {
-				glVertex3dv(Add(i, z));
+				if(z!=0)
+					glVertex3dv(Add(newCoordinates(i), z));
+				else
+					glVertex3dv(Add(i, z));
 			}
 		}	
 		glEnd();
@@ -100,7 +103,7 @@ class Prisma {
 				}
 				glEnd();
 				std::reverse(krug.begin(), krug.end());
-				krug.pop_back();
+				
 
 				glBegin(GL_TRIANGLE_FAN);
 				{
@@ -117,6 +120,7 @@ class Prisma {
 
 					}
 					double Last[3]{ 13,6,z };
+					krug.push_back(Last);
 					glVertex3dv(Last);
 				}
 				glEnd();
@@ -161,16 +165,17 @@ public:
 	void poverhnost(double height) {
 		for (double z : {0.0, height})
 		{
+			glColor3d(0, 0, 0);
 			staticpoverh(z);
 			BokovieKrug(nach, z);
 			imgVipucl(z);
-			glColor3d(0.7, 0.2, 0.7);
-			std::reverse(krug.begin(), krug.end());
-			krug.pop_back();
+			glColor3d(0, 1, 0);
 			BokovieKrug(krug,z);
-			glColor3d(0.7, 0.2, 0);
+			glColor3d(1, 0, 1);
 			imgVognut(z);
 			BokovieKrug(krug2,z);
+			glColor3d(0, 0, 0);
+
 		}
 	}
 	void vipucl(int razresh=1) {
