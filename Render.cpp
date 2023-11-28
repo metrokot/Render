@@ -7,6 +7,8 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 
 class Prisma {
 	
@@ -22,6 +24,7 @@ class Prisma {
 	int ExtraTask[2]{ 0,0 };
 	double ExtraVognDot[2];
 	std::vector<double*> krug;
+	std::vector<double*> krug2;
 	double* Add(double* DDot, double z) {
 		double DDDot[3] = { DDot[0],DDot[1], z };
 		return DDDot;
@@ -71,12 +74,6 @@ class Prisma {
 		glBegin(GL_TRIANGLES);
 		{
 			for (double* i : { A,H,B,B,D,C,H,D,B,F,D,H,F,E,D }) {
-				if (z != 0) {
-					if (RotatingUgol != 0)
-						i = newCoordinates(i);
-				}
-				else
-					krug.push_back(i);
 				glVertex3dv(Add(i, z));
 			}
 		}	
@@ -84,35 +81,35 @@ class Prisma {
 	}
 	void imgVipucl(double z) {
 			if (ExtraTask[0] == 1) {
-				double Midl[2]{ 12,3.5};
-				
+				double Midl[2]{ 12.,3.5};
 				glBegin(GL_TRIANGLE_FAN);
 				{
-					
-					double Last[2]{11,1};
-					krug.push_back(Last);
-					glVertex3dv(Add(Last,z));
-					for (double  y = 1;y >= 3.5 - std::sqrt(7.25); y -= 0.1) {
-						double dot[2] = { kvadrouravX(y,0),y };
-						if (z != 0) 
+					glVertex3dv(Add(Midl, z));
+					double Last[2]{ 11.,1. };
+					for (double y = 3.5 - std::sqrt(7.25); y <= 1; y += 0.01) {
+						double* dot;
+						dot = new double[2] {kvadrouravX(y, 0), y};
+						if (z != 0.0) 
 							*dot = *newCoordinates(dot);
 						else
-							krug.push_back(dot);
+							krug.push_back(dot);//
 						glVertex3dv(Add(dot, z));
-
 					}
-					glVertex3dv(Add(Midl,z));
-					krug.push_back(Midl);
+					krug.push_back(Last);
+					glVertex3dv(Add(Last, z));
 				}
 				glEnd();
-				
+				std::reverse(krug.begin(), krug.end());
+				krug.pop_back();
+
 				glBegin(GL_TRIANGLE_FAN);
 				{
-					glVertex3dv(Midl);
+					glVertex3dv(Add(Midl, z));
 					for (double y = 3.5 - std::sqrt(7.25); y <= 6; y += 0.1) {
 
-						double dot[2] = { kvadrouravX(y,1),y };
-						if (z != 0)
+						double* dot;
+						dot = new double[2] {kvadrouravX(y, 1), y};
+						if (z != 0.0)
 							*dot = *newCoordinates(dot);
 						else
 							krug.push_back(dot);
@@ -133,14 +130,15 @@ class Prisma {
 			double cy = ((-1 * (cx - (1 + ExtraVognDot[0]) / 2.)) / ma) + (ExtraVognDot[1] / 2.);
 			glBegin(GL_TRIANGLE_FAN);
 			{
-				krug.push_back(H);
+				krug2.push_back(H);
 				glVertex3dv(Add(H, z));
 				for (double x = 1.0; x <= 11; x += 0.1) {
-					double dot[2] = { x, circle_vpuclost(cx, cy, x) };
+					double* dot;
+					dot = new double[2] { x, circle_vpuclost(cx, cy, x) };
 					if (z != 0)
 						*dot = *newCoordinates(dot);
 					else
-						krug.push_back(dot);
+						krug2.push_back(dot);
 					glVertex3dv(Add(dot,z));
 				}
 			}
@@ -152,7 +150,7 @@ class Prisma {
 			{
 				for (double* i : { G,F,H }) {
 					if(z==0)
-						krug.push_back(i);
+						krug2.push_back(i);
 					glVertex3dv(Add(i, z));
 				}
 			}
@@ -164,14 +162,15 @@ public:
 		for (double z : {0.0, height})
 		{
 			staticpoverh(z);
-			glColor3d(0.7, 0.2, 0);
 			BokovieKrug(nach, z);
-			glColor3d(0.7, 0.2, 0.7);
 			imgVipucl(z);
+			glColor3d(0.7, 0.2, 0.7);
+			std::reverse(krug.begin(), krug.end());
+			krug.pop_back();
 			BokovieKrug(krug,z);
-			krug.clear();
+			glColor3d(0.7, 0.2, 0);
 			imgVognut(z);
-			BokovieKrug(krug,z);
+			BokovieKrug(krug2,z);
 		}
 	}
 	void vipucl(int razresh=1) {
@@ -191,8 +190,7 @@ void Render(double delta_time)
 	Prisma prism;
 	prism.vipucl();
 	prism.vognut(6, 2);
+	//prism.rotate(0.1);
 	prism.poverhnost(10);
-	
-
 }
 
