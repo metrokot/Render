@@ -10,8 +10,16 @@
 #include <algorithm>
 #include <iterator>
 
+Vector3 GetNormal(double* start, double* end1, double* end2)
+{
+	Vector3 a = Vector3(start[0] - end1[0], start[1] - end1[1], start[2] - end1[2]);
+	Vector3 b = Vector3(start[0] - end2[0], start[1] - end2[1], start[2] - end2[2]);
+	Vector3 normal = Vector3(a.Y() * b.Z() - b.Y() * a.Z(), -a.X() * b.Z() + b.X() * a.Z(), a.X() * b.Y() - a.Y() * b.X());
+	return normal;
+}
+
 class Prisma {
-	
+	Vector3 normal;
 	double A[2]{ 0,10 };
 	double B[2]{ 5,9 };
 	double C[2]{ 7, 14 };
@@ -48,7 +56,7 @@ class Prisma {
 			return y2;
 
 	}
-	double RotatingUgol=0;
+	double RotatingUgol=0.0;
 	double* newCoordinates(double* dot) {
 		double x1 = dot[0] * cos(RotatingUgol) - dot[1] * sin(RotatingUgol);
 		double y1 = dot[0] * sin(RotatingUgol) + dot[1] * cos(RotatingUgol);
@@ -60,6 +68,8 @@ class Prisma {
 		{
 			for (int i = 0; i < krugi.size()-1; i++)
 			{
+				normal = GetNormal(Add(krugi[i], 0), Add(krugi[i], z), Add(krugi[i+1], 0));
+				glNormal3d(normal.X(), normal.Y(), normal.Z());
 				glVertex3dv(Add(krugi[i], 0));
 				glVertex3dv(Add(krugi[i+1], 0));
 				glVertex3dv(Add(newCoordinates(krugi[i + 1]), z));
@@ -70,11 +80,18 @@ class Prisma {
 		}
 		glEnd();
 	}
+	void normalpoverh(double z) {
+		if (z != 0.0)
+			glNormal3d(0, 0, -1);
+		else
+			glNormal3d(0, 0, 1);
+	}
 	void staticpoverh(double z) {
 		glBegin(GL_TRIANGLES);
 		{
-			for (double* i : { A,H,B,B,D,C,H,D,B,F,D,H,F,E,D }) {
-				if(z!=0)
+			normalpoverh(z);
+			for (double* i : {A,H,B,B,D,C,H,D,B,F,D,H,F,E,D}) {
+				if(z!=0.0)
 					glVertex3dv(Add(newCoordinates(i), z));
 				else
 					glVertex3dv(Add(i, z));
@@ -87,6 +104,7 @@ class Prisma {
 				double Midl[2]{ 12.,3.5};
 				glBegin(GL_TRIANGLE_FAN);
 				{
+					normalpoverh(z);
 					glVertex3dv(Add(Midl, z));
 					double Last[2]{ 11.,1. };
 					for (double y = 3.5 - std::sqrt(7.25); y <= 1; y += 0.01) {
@@ -107,6 +125,7 @@ class Prisma {
 
 				glBegin(GL_TRIANGLE_FAN);
 				{
+					normalpoverh(z);
 					glVertex3dv(Add(Midl, z));
 					for (double y = 3.5 - std::sqrt(7.25); y <= 6; y += 0.1) {
 
@@ -134,12 +153,13 @@ class Prisma {
 			double cy = ((-1 * (cx - (1 + ExtraVognDot[0]) / 2.)) / ma) + (ExtraVognDot[1] / 2.);
 			glBegin(GL_TRIANGLE_FAN);
 			{
+				normalpoverh(z);
 				krug2.push_back(H);
 				glVertex3dv(Add(H, z));
 				for (double x = 1.0; x <= 11; x += 0.1) {
 					double* dot;
 					dot = new double[2] { x, circle_vpuclost(cx, cy, x) };
-					if (z != 0)
+					if (z != 0.0)
 						*dot = *newCoordinates(dot);
 					else
 						krug2.push_back(dot);
@@ -153,9 +173,7 @@ class Prisma {
 			glBegin(GL_TRIANGLES);
 			{
 				for (double* i : { G,F,H }) {
-					if(z==0)
-						krug2.push_back(i);
-					glVertex3dv(Add(i, z));
+					normalpoverh(z);
 				}
 			}
 			glEnd();
@@ -171,10 +189,10 @@ public:
 			imgVipucl(z);
 			glColor3d(0, 1, 0);
 			BokovieKrug(krug,z);
-			glColor3d(1, 0, 1);
-			imgVognut(z);
-			BokovieKrug(krug2,z);
 			glColor3d(0, 0, 0);
+			imgVognut(z);
+			glColor3d(1, 0, 1);
+			BokovieKrug(krug2,z);
 
 		}
 	}
