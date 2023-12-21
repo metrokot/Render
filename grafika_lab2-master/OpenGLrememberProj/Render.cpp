@@ -1,4 +1,4 @@
-﻿#include "Render.h"
+#include "Render.h"
 
 #include <sstream>
 #include <iostream>
@@ -205,13 +205,15 @@ public:
 	void poverhnost(double height) {
 		for (double z : {0.0, height})
 		{
-			glColor3d(0, 0, 0);
+			glColor3d(1, 0, 0);
 			staticpoverh(z);
+			glColor3d(1, 1, 0);
 			BokovieKrug(nach, z);
+			glColor3d(1, 0, 0);
 			imgVipucl(z);
 			glColor3d(0, 1, 0);
 			BokovieKrug(krug, z);
-			glColor3d(0, 0, 0);
+			glColor3d(1, 0, 0);
 			imgVognut(z);
 			glColor3d(1, 0, 1);
 			BokovieKrug(krug2, z,0);
